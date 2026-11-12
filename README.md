@@ -48,6 +48,8 @@ Ikuti langkah-langkah berikut untuk menjalankan proyek ini di lingkungan lokal A
 ### 1. Kloning Repositori
 ```bash
 git clone [https://github.com/inaslathifah/betterdays-social.media.git](https://github.com/inaslathifah/betterdays-social.media.git)
+```
+```bash
 cd betterdays-social.media
 ```
 
