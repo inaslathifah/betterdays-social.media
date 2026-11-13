@@ -1,8 +1,8 @@
 /**
  * Halaman Pendaftaran (Register):
  * Memfasilitasi pendaftaran akun baru di Betterdays.
- * Memvalidasi input (nama, email, password, konfirmasi password) menggunakan Zod schema.
- * Begitu pendaftaran berhasil, token langsung disimpan (auto-login) dan pengguna diarahkan ke Beranda.
+ * Memvalidasi input (nama, email, password, konfirmasi password) dengan menggunakan Zod schema.
+ * Begitu register berhasil, token langsung disimpan (auto-login) dan user akan diarahkan ke Beranda.
  */
 
 import Layout from "@/components/layout";
@@ -36,7 +36,7 @@ export default function Register() {
   // State untuk melihat/sembunyikan karakter sandi
   const [showPassword, setShowPassword] = useState(false);
 
-  // Inisialisasi React Hook Form dengan validasi registerSchema (Zod)
+  // Inisialisasi React Hook Form dengan menggunakan Zod (registrasi schema)
   const form = useForm<RegisterType>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -145,14 +145,15 @@ export default function Register() {
                       control={form.control}
                       name="password"
                       label="Password"
-                      description="Minimal 6 karakter."
+                      description="Harus 6 Karakter Ya ..."
                     >
                       {(field) => (
                         <Input
                           {...field}
                           type={showPassword ? "text" : "password"}
                           autoComplete="new-password"
-                          placeholder="Password"
+                          placeholder="Password (6 karakter)"
+                          maxLength={6}
                           disabled={busy}
                           aria-disabled={busy}
                           value={field.value as string}
@@ -173,7 +174,8 @@ export default function Register() {
                           {...field}
                           type={showPassword ? "text" : "password"}
                           autoComplete="new-password"
-                          placeholder="Ulangi Password"
+                          placeholder="Ulangi Password (6 karakter)"
+                          maxLength={6}
                           disabled={busy}
                           aria-disabled={busy}
                           value={field.value as string}

@@ -71,7 +71,7 @@ const SEED_HASH =
   "$2b$10$rh/gML4z7hDckIk88InJO.qJZxSNOQ5oyq20EhoRM7ZYDr6c7LHlK";
 
 // Kredensial akun demo bawaan untuk kemudahan testing / login cepat
-export const DEMO_PASSWORD = "password123";
+export const DEMO_PASSWORD = "psswrd";
 export const DEMO_EMAIL = "inas@betterdays.id";
 
 // Fungsi pembantu untuk membuat timestamp relatif mundur beberapa menit
@@ -122,7 +122,7 @@ function seed(): DB {
     {
       id: 4,
       name: "Aira Wibi",
-      email: "Aira@betterdays.id",
+      email: "aira@betterdays.id",
       password: SEED_HASH,
       avatar: null,
       bio: null,

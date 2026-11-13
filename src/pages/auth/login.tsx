@@ -123,9 +123,10 @@ export default function Login() {
                       {(field) => (
                         <Input
                           {...field}
-                          placeholder="Password"
+                          placeholder="Password (6 karakter)"
                           autoComplete="current-password"
                           type={showPassword ? "text" : "password"}
+                          maxLength={6}
                           disabled={form.formState.isSubmitting}
                           aria-disabled={form.formState.isSubmitting}
                           value={field.value as string}

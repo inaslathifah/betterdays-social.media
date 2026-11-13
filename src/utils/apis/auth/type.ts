@@ -9,7 +9,7 @@ import * as z from "zod";
 /**
  * Skema validasi untuk Form Login:
  * - email: wajib diisi, otomatis di-trim, harus format email valid
- * - password: wajib diisi
+ * - password: wajib diisi, harus tepat 6 karakter
  */
 export const loginSchema = z.object({
   email: z
@@ -17,14 +17,17 @@ export const loginSchema = z.object({
     .trim()
     .min(1, { message: "Email wajib diisi" })
     .email("Format email tidak valid"),
-  password: z.string().min(1, { message: "Password wajib diisi" }),
+  password: z
+    .string()
+    .min(6, { message: "Password Harus 6 Karakter" })
+    .max(6, { message: "Password Harus 6 Karakter" }),
 });
 
 /**
  * Skema validasi untuk Form Registrasi:
  * - fullname: wajib diisi, maksimal 100 karakter
  * - email: format email valid, maksimal 150 karakter
- * - password: minimal 6 karakter
+ * - password: harus tepat 6 karakter
  * - confirm_password: harus persis sama dengan nilai password
  */
 export const registerSchema = z
@@ -40,7 +43,10 @@ export const registerSchema = z
       .min(1, { message: "Email wajib diisi" })
       .email("Format email tidak valid")
       .max(150, "Email maksimal 150 karakter"),
-    password: z.string().min(6, { message: "Password minimal 6 karakter" }),
+    password: z
+      .string()
+      .min(6, { message: "Password Harus 6 Karakter" })
+      .max(6, { message: "Password Harus 6 Karakter" }),
     confirm_password: z
       .string()
       .min(1, { message: "Konfirmasi password wajib diisi" }),
