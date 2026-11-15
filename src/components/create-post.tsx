@@ -5,6 +5,7 @@
  * - Pintasan keyboard: Ctrl+Enter (atau Cmd+Enter di Mac) untuk submit cepat
  * - Lampiran gambar: Mendukung unggah berkas lokal atau tautan URL eksternal
  * - Tombol kirim otomatis aktif hanya jika ada konten (teks atau gambar)
+ * - Validasi: tombol posting di-disable jika caption melebihi 500 kata
  */
 
 import { useState } from "react";
@@ -17,10 +18,21 @@ import { createPostSchema, createPostType } from "@/utils/apis/post/type";
 import { CustomFormField } from "./custom-formfield";
 import { Textarea } from "./ui/textarea";
 import { ImageMenu, ImagePreview, UrlInput } from "./image-attach";
+import { LocationButton } from "./location-attach";
 
 interface Props {
   onsubmit: (data: createPostType) => void | Promise<void>;
   placeholder?: string;
+}
+
+// Batas maksimal kata pada caption posting
+const MAX_WORDS = 500;
+
+/**
+ * Menghitung jumlah kata dalam suatu string
+ */
+function countWords(text: string): number {
+  return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
 }
 
 // Nilai default form kosong
@@ -28,6 +40,7 @@ const emptyValues = (): createPostType => ({
   image: new File([], ""),
   image_url: "",
   caption: "",
+  location: "",
 });
 
 export default function CreatePost(props: Props) {
@@ -44,7 +57,13 @@ export default function CreatePost(props: Props) {
   const file = form.watch("image");
   const url = form.watch("image_url");
   const caption = form.watch("caption");
+  const location = form.watch("location");
   const urlError = form.formState.errors.image_url?.message;
+
+  // Hitung jumlah kata caption
+  const wordCount = countWords(caption);
+  const isOverLimit = wordCount > MAX_WORDS;
+
   // Validasi apakah pengguna sudah mengetik sesuatu atau memilih gambar
   const hasContent = caption.trim() !== "" || file.name !== "" || url.trim() !== "";
   const busy = form.formState.isSubmitting;
@@ -73,7 +92,6 @@ export default function CreatePost(props: Props) {
                 <Textarea
                   {...field}
                   rows={2}
-                  maxLength={2000}
                   className="max-h-60 min-h-[56px] resize-none border-0 bg-transparent px-3 py-2 text-[17px] leading-7 shadow-none focus-visible:ring-0"
                   placeholder={placeholder}
                   aria-label="Tulis status"
@@ -90,7 +108,7 @@ export default function CreatePost(props: Props) {
                   onKeyDown={(e) => {
                     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
                       e.preventDefault();
-                      form.handleSubmit(submit)();
+                      if (!isOverLimit) form.handleSubmit(submit)();
                     }
                   }}
                 />
@@ -128,31 +146,68 @@ export default function CreatePost(props: Props) {
               />
             )}
 
-            {/* Bar Aksi Bawah: Pilihan Lampiran Gambar & Tombol Kirim Posting */}
-            <div className="mt-1 flex items-center justify-between">
-              <ImageMenu
-                disabled={busy}
-                onPickFile={(f) => {
-                  form.setValue("image", f, { shouldValidate: true });
-                  form.setValue("image_url", "");
-                  setUrlOpen(false);
-                }}
-                onPickUrl={() => {
-                  form.setValue("image", new File([], ""));
-                  setUrlOpen(true);
-                }}
-              />
-              <Button
-                type="submit"
-                variant="brand"
-                disabled={busy || !hasContent}
-                className="h-9 gap-1.5 rounded-full pl-4 pr-3"
-                aria-label="Kirim postingan"
-              >
-                {busy ? "Mengirim…" : "Posting"}
-                <ArrowUp className="h-4 w-4" />
-              </Button>
+            {/* Bar Aksi Bawah: Pilihan Lampiran Gambar, Lokasi & Tombol Kirim Posting */}
+            <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <ImageMenu
+                  disabled={busy}
+                  onPickFile={(f) => {
+                    form.setValue("image", f, { shouldValidate: true });
+                    form.setValue("image_url", "");
+                    setUrlOpen(false);
+                  }}
+                  onPickUrl={() => {
+                    form.setValue("image", new File([], ""));
+                    setUrlOpen(true);
+                  }}
+                />
+                <LocationButton
+                  disabled={busy}
+                  location={location}
+                  onSelect={(loc) =>
+                    form.setValue("location", loc, { shouldValidate: true })
+                  }
+                  onRemove={() =>
+                    form.setValue("location", "", { shouldValidate: true })
+                  }
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Penghitung kata dengan indikator warna */}
+                {caption.trim() !== "" && (
+                  <span
+                    className={`text-xs tabular-nums transition-colors ${
+                      isOverLimit
+                        ? "font-semibold text-destructive"
+                        : wordCount > MAX_WORDS * 0.8
+                        ? "text-amber-500"
+                        : "text-muted-foreground"
+                    }`}
+                    aria-live="polite"
+                  >
+                    {wordCount}/{MAX_WORDS} kata
+                  </span>
+                )}
+                <Button
+                  type="submit"
+                  variant="brand"
+                  disabled={busy || !hasContent || isOverLimit}
+                  className="h-9 gap-1.5 rounded-full pl-4 pr-3"
+                  aria-label="Kirim postingan"
+                  title={isOverLimit ? `Caption melebihi batas ${MAX_WORDS} kata` : undefined}
+                >
+                  {busy ? "Mengirim…" : "Posting"}
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
+
+            {/* Pesan error over limit */}
+            {isOverLimit && (
+              <p className="mt-1 px-3 pb-1 text-xs text-destructive">
+                Caption melebihi batas {MAX_WORDS} kata ({wordCount - MAX_WORDS} kata lebih).
+              </p>
+            )}
           </div>
         </form>
       </Form>

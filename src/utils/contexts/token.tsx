@@ -47,16 +47,21 @@ export const TokenProvider = ({ children }: Props) => {
     token !== "" && fetchProfile();
   }, [token]);
 
-  axiosWithConfig.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      if (error.response.status === 401) {
-        changeToken();
+  // Jika server menjawab 401 (token kedaluwarsa/tidak valid), otomatis logout.
+  // Didaftarkan sekali (dan dibersihkan saat unmount); error jaringan tidak punya `response`.
+  useEffect(() => {
+    const id = axiosWithConfig.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error?.response?.status === 401) {
+          changeToken();
+        }
+        return Promise.reject(error);
       }
-
-      return Promise.reject(error);
-    }
-  );
+    );
+    return () => axiosWithConfig.interceptors.response.eject(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function fetchProfile() {
     try {

@@ -1,6 +1,6 @@
 /**
  * Komponen Avatar Pengguna (UserAvatar):
- * Menampilkan foto profil pengguna (src).
+ * Menampilkan foto profil pengguna.
  * Jika foto tidak ada atau gagal dimuat, secara otomatis menampilkan AvatarFallback
  * berupa huruf inisial nama dengan warna latar belakang lembut (pastel tones)
  * yang konsisten untuk nama yang sama.

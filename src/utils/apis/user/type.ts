@@ -22,6 +22,18 @@ export interface IProfile {
   avatar: string | null;
   bio: string | null;
   created_at: string;
+  followers_count?: number;
+  following_count?: number;
+  posts_count?: number;
+  is_following?: boolean;
+}
+
+export interface IFollowUser {
+  id: number;
+  name: string;
+  avatar: string | null;
+  bio: string | null;
+  is_following?: boolean;
 }
 
 /**

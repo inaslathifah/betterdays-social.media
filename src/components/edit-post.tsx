@@ -23,24 +23,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "./ui/form";
 import { CustomFormField } from "./custom-formfield";
 import { ImageMenu, ImagePreview, UrlInput } from "./image-attach";
+import { LocationButton } from "./location-attach";
 
 interface Props {
   caption: string;
   imgUrl?: string | null;
+  location?: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: updatePostType) => void | Promise<void>;
 }
 
 // Helper membuat struktur data default
-const blank = (caption: string): updatePostType => ({
+const blank = (caption: string, location?: string | null): updatePostType => ({
   image: new File([], ""),
   image_url: "",
   caption,
+  location: location || "",
 });
 
 export function EditPost(props: Props) {
-  const { caption, imgUrl, open, onOpenChange, onSubmit } = props;
+  const { caption, imgUrl, location: initialLocation, open, onOpenChange, onSubmit } = props;
   const [urlOpen, setUrlOpen] = useState(false);
   const [removeImage, setRemoveImage] = useState(false);
 
@@ -57,20 +60,21 @@ export function EditPost(props: Props) {
       }
       return zodResolver(createPostSchema)(values, ctx, opts) as never;
     },
-    defaultValues: blank(caption),
+    defaultValues: blank(caption, initialLocation),
   });
 
   // Sinkronisasi data saat modal dialog dibuka
   useEffect(() => {
     if (open) {
-      form.reset(blank(caption));
+      form.reset(blank(caption, initialLocation));
       setRemoveImage(false);
       setUrlOpen(false);
     }
-  }, [caption, form, open]);
+  }, [caption, initialLocation, form, open]);
 
   const file = form.watch("image");
   const url = form.watch("image_url");
+  const loc = form.watch("location");
   const urlError = form.formState.errors.image_url?.message;
   const replaced = file.name !== "" || (url !== "" && !urlError);
   const busy = form.formState.isSubmitting;
@@ -80,7 +84,11 @@ export function EditPost(props: Props) {
    */
   async function submit(data: updatePostType) {
     try {
-      await onSubmit({ ...data, remove_image: removeImage && !replaced });
+      await onSubmit({
+        ...data,
+        remove_image: removeImage && !replaced,
+        remove_location: !data.location,
+      });
     } catch {
       // Error ditangani pemanggil
     }
@@ -146,22 +154,30 @@ export function EditPost(props: Props) {
                   }}
                 />
               )}
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                <ImageMenu
-                  align="start"
+              <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <ImageMenu
+                    align="start"
+                    disabled={busy}
+                    label="Ganti gambar"
+                    onPickFile={(f) => {
+                      form.setValue("image", f, { shouldValidate: true });
+                      form.setValue("image_url", "");
+                      setUrlOpen(false);
+                    }}
+                    onPickUrl={() => {
+                      form.setValue("image", new File([], ""));
+                      setUrlOpen(true);
+                    }}
+                  />
+                  <span>{imgUrl || replaced ? "Ganti gambar" : "Tambah gambar"}</span>
+                </div>
+                <LocationButton
                   disabled={busy}
-                  label="Ganti gambar"
-                  onPickFile={(f) => {
-                    form.setValue("image", f, { shouldValidate: true });
-                    form.setValue("image_url", "");
-                    setUrlOpen(false);
-                  }}
-                  onPickUrl={() => {
-                    form.setValue("image", new File([], ""));
-                    setUrlOpen(true);
-                  }}
+                  location={loc}
+                  onSelect={(l) => form.setValue("location", l, { shouldValidate: true })}
+                  onRemove={() => form.setValue("location", "", { shouldValidate: true })}
                 />
-                {imgUrl || replaced ? "Ganti gambar" : "Tambah gambar"}
               </div>
             </div>
 

@@ -26,7 +26,7 @@ function greeting() {
   const h = new Date().getHours();
   if (h >= 4 && h < 11) return "Good Morning";
   if (h >= 11 && h < 18) return "Good Afternoon";
-  if (h >= 21 && h < 23) return "Good Night";
+  if (h >= 21 && h < 22) return "Good Night";
   return "Good Evening";
 }
 
@@ -62,6 +62,9 @@ function Home() {
     addComment,
     editComment,
     removeComment,
+    addReply,
+    handleReplyLike,
+    removeReply,
     handleDelete,
     handleUpdate,
     handleLike,
@@ -93,9 +96,11 @@ function Home() {
           <PostCard
             key={post.id}
             postID={post.id}
+            userId={post.user_id}
             name={post.name}
             avatar={post.avatar}
             caption={post.caption}
+            location={post.location}
             time={post.created_at}
             updatedAt={post.updated_at}
             imgUrl={post.image}
@@ -109,6 +114,9 @@ function Home() {
             onComment={addComment}
             onCommentUpdate={editComment}
             onCommentDelete={removeComment}
+            onReply={addReply}
+            onReplyLike={handleReplyLike}
+            onReplyDelete={removeReply}
             onDelete={handleDelete}
             onUpdate={handleUpdate}
           />

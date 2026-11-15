@@ -1,6 +1,6 @@
-import { CommentType } from "./type";
+import { CommentType, IReply } from "./type";
 import { getErrorMessage } from "@/utils/apis/get-error-message";
-import { Response } from "@/utils/types/api";
+import { Response, ResponseData } from "@/utils/types/api";
 import axiosWithConfig from "../axios-with-config";
 import { checkProperty, valueFormatData } from "@/utils/formatter";
 
@@ -42,6 +42,49 @@ export async function updateComment(
     const response = await axiosWithConfig.put(`/comments/${commentID}`, body);
 
     return response.data as Response;
+  } catch (error) {
+    throw Error(getErrorMessage(error));
+  }
+}
+
+/**
+ * Menambahkan balasan ke suatu komentar, atau ke balasan lain bila parentReplyID diisi
+ */
+export async function createReply(
+  commentID: number,
+  reply: string,
+  parentReplyID?: number | null
+) {
+  try {
+    const response = await axiosWithConfig.post(`/comments/${commentID}/replies`, {
+      reply,
+      parent_reply_id: parentReplyID ?? null,
+    });
+    return response.data as ResponseData<IReply>;
+  } catch (error) {
+    throw Error(getErrorMessage(error));
+  }
+}
+
+/**
+ * Menghapus balasan
+ */
+export async function deleteReply(replyID: number) {
+  try {
+    const response = await axiosWithConfig.delete(`/replies/${replyID}`);
+    return response.data as Response;
+  } catch (error) {
+    throw Error(getErrorMessage(error));
+  }
+}
+
+/**
+ * Toggle like pada balasan komentar
+ */
+export async function toggleReplyLike(replyID: number) {
+  try {
+    const response = await axiosWithConfig.post(`/replies/${replyID}/like`);
+    return response.data as ResponseData<{ liked: boolean; likes_count: number }>;
   } catch (error) {
     throw Error(getErrorMessage(error));
   }

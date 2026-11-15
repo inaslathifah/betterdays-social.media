@@ -1,7 +1,6 @@
 /**
  * Utilitas Pengolahan & Validasi Gambar:
- * Mengatur batasan upload gambar, validasi tipe file & ukuran,
- * konversi gambar lokal ke Data URL (Base64 JPEG terkompresi) via Canvas HTML5,
+ * Mengatur batasan upload gambar, validasi tipe file & ukuran (pemrosesan akhir dilakukan backend),
  * serta pembuatan inisial huruf nama pengguna untuk avatar cadangan.
  */
 
@@ -44,50 +43,6 @@ export function isSafeImageUrl(value: string): boolean {
   } catch {
     return false;
   }
-}
-
-/**
- * Mengonversi File gambar menjadi Base64 Data URL JPEG yang sudah di-resize & dikompres.
- * Tujuannya agar gambar yang disimpan di mock localStorage tidak menghabiskan kuota browser.
- * 
- * @param file Berkas gambar asli yang dipilih pengguna
- * @param maxDim Batas dimensi maksimal lebar/tinggi dalam pixel (default: 1280px)
- */
-export function fileToDataURL(file: File, maxDim = 1280): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const objectUrl = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      // Hitung skala rasio agar tidak melebihi maxDim
-      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-      const w = Math.max(1, Math.round(img.width * scale));
-      const h = Math.max(1, Math.round(img.height * scale));
-
-      // Buat elemen canvas di latar belakang untuk me-render ulang
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        URL.revokeObjectURL(objectUrl);
-        return reject(new Error("Gambar tidak dapat diproses"));
-      }
-
-      // Beri background putih untuk gambar PNG transparan sebelum dikonversi ke JPEG
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, w, h);
-      ctx.drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(objectUrl);
-
-      // Simpan sebagai JPEG dengan kualitas kompresi 82%
-      resolve(canvas.toDataURL("image/jpeg", 0.82));
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      reject(new Error("Berkas bukan gambar yang valid"));
-    };
-    img.src = objectUrl;
-  });
 }
 
 /**

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { CommentType, commentSchema } from "@/utils/apis/comment/type";
 import { CustomFormField } from "./custom-formfield";
 import { ImageMenu, ImagePreview, UrlInput } from "./image-attach";
+import { LocationButton } from "./location-attach";
 import UserAvatar from "./user-avatar";
 import { useToken } from "@/utils/contexts/token";
 
@@ -35,6 +36,7 @@ export default function CommentForm({ postID, onComment }: Props) {
     defaultValues: {
       post_id: postID,
       comment: "",
+      location: "",
       image: new File([], ""),
       image_url: "",
     },
@@ -42,6 +44,7 @@ export default function CommentForm({ postID, onComment }: Props) {
 
   const file = form.watch("image");
   const url = form.watch("image_url");
+  const location = form.watch("location");
   const hasContent = form.watch("comment").trim() !== "" || file.name !== "" || url.trim() !== "";
   const urlError = form.formState.errors.image_url?.message;
   const fieldError =
@@ -56,6 +59,7 @@ export default function CommentForm({ postID, onComment }: Props) {
       form.reset({
         post_id: postID,
         comment: "",
+        location: "",
         image: new File([], ""),
         image_url: "",
       });
@@ -95,6 +99,17 @@ export default function CommentForm({ postID, onComment }: Props) {
               }}
             />
 
+            {/* Tombol Tambahkan Lokasi ke Komentar */}
+            <LocationButton
+              disabled={busy}
+              size="sm"
+              showLabel={false}
+              className="h-8 w-8 p-0"
+              location={location}
+              onSelect={(loc) => form.setValue("location", loc)}
+              onRemove={() => form.setValue("location", "")}
+            />
+
             {/* Input Teks Komentar */}
             <CustomFormField control={form.control} name="comment" label="">
               {(field) => (
@@ -123,6 +138,19 @@ export default function CommentForm({ postID, onComment }: Props) {
               <ArrowUp className="h-4 w-4" />
             </Button>
           </div>
+
+          {/* Pratinjau Badge Lokasi yang Terpilih pada Komentar */}
+          {location && (
+            <div className="mt-1.5 flex items-center">
+              <LocationButton
+                disabled={busy}
+                size="sm"
+                location={location}
+                onSelect={(loc) => form.setValue("location", loc)}
+                onRemove={() => form.setValue("location", "")}
+              />
+            </div>
+          )}
 
           {/* Input URL jika user memilih tempel link gambar */}
           {urlOpen && (

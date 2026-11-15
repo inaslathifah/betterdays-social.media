@@ -10,6 +10,7 @@ import Layout from "@/components/layout";
 import PostCard from "@/components/post-card";
 import CreatePost from "@/components/create-post";
 import { BioProfile } from "@/components/bio-profile";
+import FollowModal from "@/components/follow-modal";
 import { EmptyFeed, FeedSkeleton } from "@/components/feed-state";
 import { useCallback, useEffect, useState } from "react";
 import { getAllPosts } from "@/utils/apis/post/api";
@@ -23,7 +24,8 @@ function ProfilePage() {
   const [posts, setPosts] = useState<IPost[]>([]);
   // Indikator loading data
   const [loading, setLoading] = useState(true);
-  const { user } = useToken();
+  const [followModalType, setFollowModalType] = useState<"followers" | "following" | null>(null);
+  const { user, refreshUser } = useToken();
 
   const userId = user?.id;
 
@@ -43,8 +45,11 @@ function ProfilePage() {
 
   // `user` ikut jadi dependensi agar daftar dimuat ulang setelah profil diubah
   useEffect(() => {
-    if (user) fetchPost();
-  }, [user, fetchPost]);
+    if (user) {
+      fetchPost();
+      refreshUser();
+    }
+  }, [userId]);
 
   // Hook untuk mengelola interaksi postingan & komentar
   const {
@@ -52,6 +57,9 @@ function ProfilePage() {
     addComment,
     editComment,
     removeComment,
+    addReply,
+    handleReplyLike,
+    removeReply,
     handleDelete,
     handleUpdate,
     handleLike,
@@ -61,12 +69,28 @@ function ProfilePage() {
     <Layout withUser navBlue centerX>
       {/* Informasi Kartu Bio Profil Pengguna */}
       <BioProfile
+        userId={user?.id}
         name={user?.name}
         email={user?.email}
         bio={user?.bio}
         avatar={user?.avatar}
         totalPost={posts.length}
+        followersCount={user?.followers_count ?? 0}
+        followingCount={user?.following_count ?? 0}
+        onFollowersClick={() => setFollowModalType("followers")}
+        onFollowingClick={() => setFollowModalType("following")}
       />
+
+      {/* Modal Pengikut & Mengikuti */}
+      {user && (
+        <FollowModal
+          userId={user.id}
+          type={followModalType}
+          open={!!followModalType}
+          onOpenChange={(op) => !op && setFollowModalType(null)}
+          onFollowChange={() => refreshUser()}
+        />
+      )}
 
       {/* Form Tambah Postingan Baru */}
       <CreatePost onsubmit={(data) => addPost(data)} />
@@ -81,9 +105,11 @@ function ProfilePage() {
           <PostCard
             key={post.id}
             postID={post.id}
+            userId={post.user_id}
             name={post.name}
             avatar={post.avatar}
             caption={post.caption}
+            location={post.location}
             time={post.created_at}
             updatedAt={post.updated_at}
             imgUrl={post.image}
@@ -96,6 +122,9 @@ function ProfilePage() {
             onComment={addComment}
             onCommentUpdate={editComment}
             onCommentDelete={removeComment}
+            onReply={addReply}
+            onReplyLike={handleReplyLike}
+            onReplyDelete={removeReply}
             onDelete={handleDelete}
             onUpdate={handleUpdate}
           />

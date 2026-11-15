@@ -11,7 +11,14 @@ import { ArrowLeft } from "lucide-react";
 
 import { deletePost, getPostWithID, toggleLike, updatePost } from "@/utils/apis/post/api";
 import { IComments, IPostWithComments, updatePostType } from "@/utils/apis/post/type";
-import { createComment, deleteComment, updateComment } from "@/utils/apis/comment/api";
+import {
+  createComment,
+  createReply,
+  deleteComment,
+  deleteReply,
+  toggleReplyLike,
+  updateComment,
+} from "@/utils/apis/comment/api";
 import { CommentUpdateBody } from "@/components/comment-item";
 import { CommentType } from "@/utils/apis/comment/type";
 import { useToken } from "@/utils/contexts/token";
@@ -79,6 +86,51 @@ export default function PostWithComment() {
   async function removeComment(commentID: number) {
     try {
       const result = await deleteComment(commentID);
+      toast.success(result.message);
+      await fetchPost();
+    } catch (error) {
+      toast.error((error as Error).message);
+      throw error;
+    }
+  }
+
+  /**
+   * Membalas komentar, atau membalas balasan lain (bercabang) bila parentReplyID diisi
+   */
+  async function addReply(
+    commentID: number,
+    replyText: string,
+    parentReplyID?: number | null
+  ) {
+    try {
+      const result = await createReply(commentID, replyText, parentReplyID);
+      toast.success(result.message);
+      await fetchPost();
+      return result.data;
+    } catch (error) {
+      toast.error((error as Error).message);
+      throw error;
+    }
+  }
+
+  /**
+   * Like / unlike sebuah balasan lalu muat ulang data
+   */
+  async function handleReplyLike(replyID: number) {
+    try {
+      await toggleReplyLike(replyID);
+      await fetchPost();
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  }
+
+  /**
+   * Menghapus balasan (beserta cabang di bawahnya)
+   */
+  async function removeReply(replyID: number) {
+    try {
+      const result = await deleteReply(replyID);
       toast.success(result.message);
       await fetchPost();
     } catch (error) {
@@ -160,9 +212,11 @@ export default function PostWithComment() {
       {post && (
         <PostCard
           postID={post.id}
+          userId={post.user_id}
           name={post.name}
           avatar={post.avatar}
           caption={post.caption}
+          location={post.location}
           time={post.created_at}
           updatedAt={post.updated_at}
           imgUrl={post.image}
@@ -176,6 +230,9 @@ export default function PostWithComment() {
           onComment={addComment}
           onCommentUpdate={editComment}
           onCommentDelete={removeComment}
+          onReply={addReply}
+          onReplyLike={handleReplyLike}
+          onReplyDelete={removeReply}
           onDelete={handleDelete}
           onUpdate={handleUpdate}
         />

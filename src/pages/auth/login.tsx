@@ -29,9 +29,6 @@ import { CustomFormField } from "@/components/custom-formfield";
 import { userLogin } from "@/utils/apis/auth/api";
 import { useToken } from "@/utils/contexts/token";
 import { toast } from "sonner";
-import Logo from "@/components/logo";
-import { USE_DUMMY_API } from "@/utils/apis/axios-with-config";
-import { DEMO_EMAIL, DEMO_PASSWORD } from "@/utils/mock/db";
 
 export default function Login() {
   // State untuk toggle visibilitas karakter sandi (show/hide password)
@@ -67,7 +64,6 @@ export default function Login() {
       <div className="w-full max-w-md">
         {/* Header Logo dan Nama Aplikasi */}
         <div className="mb-8 text-center">
-          <Logo className="mx-auto mb-4 h-9 w-9" />
           <h2 className="font-serif text-[38px] font-normal leading-tight tracking-tight">
             Welcome to Betterdays
           </h2>
@@ -158,7 +154,7 @@ export default function Login() {
                 </div>
               </CardContent>
 
-              {/* Tombol Aksi Submit Form & Pengisian Cepat Akun Demo */}
+              {/* Tombol Aksi Submit Form */}
               <CardFooter className="flex-col gap-3">
                 <Button
                   type="submit"
@@ -168,20 +164,6 @@ export default function Login() {
                 >
                   {form.formState.isSubmitting ? "Memproses…" : "Masuk"}
                 </Button>
-                {USE_DUMMY_API && (
-                  <button
-                    type="button"
-                    className="text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-                    onClick={() => {
-                      form.setValue("email", DEMO_EMAIL, { shouldValidate: true });
-                      form.setValue("password", DEMO_PASSWORD, {
-                        shouldValidate: true,
-                      });
-                    }}
-                  >
-                    Isi dengan akun demo
-                  </button>
-                )}
               </CardFooter>
             </form>
           </Form>

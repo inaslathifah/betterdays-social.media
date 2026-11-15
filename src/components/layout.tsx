@@ -38,8 +38,6 @@ export default function Layout(props: Props) {
       >
         {children}
       </main>
-
-      {/* Footer Kaki Halaman */}
       <Footer />
     </div>
   );

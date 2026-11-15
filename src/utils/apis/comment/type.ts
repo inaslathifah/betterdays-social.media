@@ -40,6 +40,7 @@ export const commentSchema = z
         (v) => v === "" || isSafeImageUrl(v),
         "URL gambar tidak valid (harus diawali http:// atau https://)"
       ),
+    location: z.string().trim().max(150, "Maksimal 150 karakter").optional(),
   })
   .refine((d) => d.comment !== "" || d.image.name !== "" || d.image_url !== "", {
     path: ["comment"],
@@ -50,8 +51,26 @@ export const commentSchema = z
 export type CommentType = z.infer<typeof commentSchema>;
 
 /**
+ * Entitas Baris Reply (IReply):
+ * Berisi ID, nama penulis, avatar, teks balasan, like count, status liked, dan waktu dibuat.
+ */
+export interface IReply {
+  id: number;
+  comment_id: number;
+  parent_reply_id: number | null; // null = balasan langsung ke komentar
+  user_id: number;
+  name: string;
+  avatar: string | null;
+  reply: string;
+  created_at: string;
+  likes_count: number;
+  liked: boolean;
+  replies: IReply[]; // balasan bercabang (anak dari balasan ini)
+}
+
+/**
  * Entitas Baris Komentar (IComments):
- * Berisi ID, nama penulis, avatar, teks komentar, lampiran gambar, dan waktu dibuat.
+ * Berisi ID, nama penulis, avatar, teks komentar, lampiran gambar, lokasi, replies, dan waktu dibuat.
  */
 export interface IComments {
   id: number;
@@ -61,5 +80,7 @@ export interface IComments {
   avatar: string | null;
   comment: string;
   image: string | null;
+  location?: string | null;
   created_at: string;
+  replies: IReply[];
 }

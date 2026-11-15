@@ -17,6 +17,7 @@ import {
 import EditProfile from "@/pages/edit-profile";
 import ProtectedRoutes from "./protected-routes";
 import PostWithComment from "@/pages/post-with-comment";
+import UserProfilePage from "@/pages/user-profile";
 
 // Konfigurasi daftar rute URL aplikasi
 const router = createBrowserRouter([
@@ -32,6 +33,8 @@ const router = createBrowserRouter([
       { path: "/register", element: <Register /> },
       // Halaman Profil Pengguna yang sedang login (butuh login)
       { path: "/profile", element: <ProfilePage /> },
+      // Halaman Profil Pengguna Lain (publik, butuh login)
+      { path: "/user/:userId", element: <UserProfilePage /> },
       // Halaman Edit Profil & Ganti Password (butuh login)
       { path: "/edit-profile", element: <EditProfile /> },
       // Halaman Detail Postingan beserta Komentarnya

@@ -41,6 +41,7 @@ export const createPostSchema = z
         "URL gambar tidak valid (harus diawali http:// atau https://)"
       ),
     caption: z.string().trim().max(2000, "Maksimal 2000 karakter"),
+    location: z.string().trim().max(150, "Maksimal 150 karakter").optional(),
   })
   .refine((d) => d.caption !== "" || d.image.name !== "" || d.image_url !== "", {
     path: ["caption"],
@@ -50,8 +51,11 @@ export const createPostSchema = z
 // Tipe data input pembuatan post baru
 export type createPostType = z.infer<typeof createPostSchema>;
 
-// Tipe data input pembaruan post (dilengkapi flag opsional remove_image)
-export type updatePostType = createPostType & { remove_image?: boolean };
+// Tipe data input pembaruan post (dilengkapi flag opsional remove_image dan remove_location)
+export type updatePostType = createPostType & {
+  remove_image?: boolean;
+  remove_location?: boolean;
+};
 
 /**
  * Entitas Postingan Lengkap (IPost):
@@ -66,6 +70,7 @@ export interface IPost {
   updated_at: string | null;
   image: string | null;
   caption: string;
+  location?: string | null;
   likes_count: number;
   liked: boolean;
   comments: IComments[];

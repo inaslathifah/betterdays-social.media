@@ -28,7 +28,6 @@ import { CustomFormField } from "@/components/custom-formfield";
 import { userRegister } from "@/utils/apis/auth/api";
 import { useToken } from "@/utils/contexts/token";
 import { toast } from "sonner";
-import Logo from "@/components/logo";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -70,9 +69,8 @@ export default function Register() {
   return (
     <Layout navBlue centerX centerY containerTranparant>
       <div className="w-full max-w-md">
-        {/* Header Logo dan Judul Halaman */}
+        {/* Header Logo dan Judul Halaman */} 
         <div className="mb-8 text-center">
-          <Logo className="mx-auto mb-4 h-9 w-9" />
           <h2 className="font-serif text-[38px] font-normal leading-tight tracking-tight">
             Buat akun Betterdays
           </h2>

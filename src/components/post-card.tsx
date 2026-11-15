@@ -1,7 +1,7 @@
 /**
  * Komponen Kartu Postingan (PostCard):
  * Merupakan elemen inti antarmuka linimasa:
- * 1. Header: Avatar penulis, nama, waktu publikasi relatif (dan penanda diedit), menu titik tiga (edit/hapus).
+ * 1. Header: Avatar penulis (klik → profil user), nama, waktu publikasi relatif (dan penanda diedit), menu titik tiga (edit/hapus).
  * 2. Konten: Teks status (caption) bergaya font serif yang nyaman dibaca dan gambar lampiran (jika ada).
  * 3. Bar Aksi: Tombol suka (LikeButton) dan jumlah komentar yang dapat diklik untuk ke halaman detail.
  * 4. Daftar Komentar: Menampilkan 2 komentar terbaru (preview) atau seluruh komentar, beserta form tambah komentar.
@@ -15,12 +15,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MessageCircle, Ellipsis, Pencil, Trash2 } from "lucide-react";
+import { MessageCircle, Ellipsis, Pencil, Trash2, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { EditPost } from "./edit-post";
 import Alert from "./alert";
 import { useState } from "react";
-import { CommentType, IComments } from "@/utils/apis/comment/type";
+import { CommentType, IComments, IReply } from "@/utils/apis/comment/type";
 import { updatePostType } from "@/utils/apis/post/type";
 import { fullDate, timeAgo } from "@/utils/date";
 import UserAvatar from "./user-avatar";
@@ -31,9 +31,11 @@ import CommentForm from "./comment-form";
 
 interface Types {
   postID: number;
+  userId: number; // ID pemilik post (untuk nge-link ke profil user lain)
   name: string;
   avatar?: string | null;
   caption: string;
+  location?: string | null;
   time: string;
   updatedAt?: string | null;
   imgUrl?: string | null;
@@ -47,6 +49,13 @@ interface Types {
   onComment: (data: CommentType) => void | Promise<void>;
   onCommentUpdate?: (commentID: number, body: CommentUpdateBody) => void | Promise<void>;
   onCommentDelete?: (commentID: number) => void | Promise<void>;
+  onReply?: (
+    commentID: number,
+    replyText: string,
+    parentReplyID?: number | null
+  ) => Promise<IReply | void>;
+  onReplyLike?: (replyID: number) => Promise<void>;
+  onReplyDelete?: (replyID: number) => Promise<void>;
   onDelete: (postID: number) => Promise<void>;
   onUpdate?: (body: updatePostType, postID: number) => void | Promise<void>;
 }
@@ -59,6 +68,7 @@ export default function PostCard(props: Types) {
     name,
     avatar,
     caption,
+    location,
     time,
     updatedAt,
     withOption,
@@ -66,6 +76,7 @@ export default function PostCard(props: Types) {
     withInputComment,
     showAllComments,
     postID,
+    userId,
     likes,
     liked,
     comments,
@@ -73,6 +84,9 @@ export default function PostCard(props: Types) {
     onComment,
     onCommentUpdate,
     onCommentDelete,
+    onReply,
+    onReplyLike,
+    onReplyDelete,
     onDelete,
     onUpdate,
   } = props;
@@ -91,10 +105,14 @@ export default function PostCard(props: Types) {
       <CardContent className="p-5">
         {/* Header Postingan: Avatar, Nama Penulis, dan Tanggal Publikasi */}
         <header className="flex items-start gap-3">
-          <UserAvatar name={name} src={avatar} className="h-10 w-10" />
+          <Link to={`/user/${userId}`} className="shrink-0">
+            <UserAvatar name={name} src={avatar} className="h-10 w-10 transition-opacity hover:opacity-80" />
+          </Link>
           <div className="min-w-0 flex-1 leading-tight">
-            <p className="truncate text-[15px] font-medium">{name}</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
+            <Link to={`/user/${userId}`} className="truncate text-[15px] font-medium hover:underline">
+              {name}
+            </Link>
+            <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground">
               {/* Waktu relatif dan tooltip tanggal lengkap */}
               <time dateTime={time} title={fullDate(time)}>
                 {timeAgo(time)}
@@ -102,7 +120,14 @@ export default function PostCard(props: Types) {
               {updatedAt && (
                 <span title={`Diedit ${fullDate(updatedAt)}`}> · diedit</span>
               )}
-            </p>
+              {location && (
+                <span className="inline-flex items-center gap-0.5 font-normal text-muted-foreground/90">
+                  <span>·</span>
+                  <MapPin className="h-3 w-3 text-primary inline shrink-0" />
+                  <span className="truncate max-w-[180px]">{location}</span>
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Menu Opsi Titik Tiga (Hanya untuk pemilik postingan) */}
@@ -186,6 +211,9 @@ export default function PostCard(props: Types) {
                 isOwner={c.user_id === user?.id}
                 onUpdate={onCommentUpdate}
                 onDelete={onCommentDelete}
+                onReply={onReply}
+                onReplyLike={onReplyLike}
+                onReplyDelete={onReplyDelete}
               />
             ))}
 
@@ -201,6 +229,7 @@ export default function PostCard(props: Types) {
       <EditPost
         caption={caption}
         imgUrl={imgUrl}
+        location={location}
         open={showEditDialog}
         onOpenChange={setShowEditDialog}
         onSubmit={async (data) => {
@@ -222,7 +251,7 @@ export default function PostCard(props: Types) {
             await onDelete(postID);
             setShowDeleteDialog(false);
           } catch (error) {
-            // Error ditangani di hook
+            // Error ini ditangani di hook
           }
         }}
         onCancel={() => {

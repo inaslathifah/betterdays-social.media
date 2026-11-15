@@ -2,7 +2,7 @@
  * Komponen Penjaga Rute (Protected Routes / Route Guard):
  * Mengontrol navigasi berdasarkan status autentikasi pengguna (token):
  * 1. Mencegah user yang SUDAH login membuka halaman /login dan /register (redirect ke Beranda "/").
- * 2. Mencegah user yang BELUM login membuka halaman privat (/, /profile, /edit-profile, /post/:id)
+ * 2. Mencegah user yang BELUM login membuka halaman privat (/, /profile, /user/:id, /edit-profile, /post/:id)
  *    dan mengarahkannya ke /login dengan pesan notifikasi toast peringatan.
  */
 
@@ -19,10 +19,12 @@ const protectedByToken = ["/", "/profile", "/edit-profile"];
 
 // Helper untuk mengecek apakah rute tertentu membutuhkan autentikasi
 const needsLogin = (pathname: string) =>
-  protectedByToken.includes(pathname) || pathname.startsWith("/post/");
+  protectedByToken.includes(pathname) ||
+  pathname.startsWith("/post/") ||
+  pathname.startsWith("/user/");
 
 /**
- * Komponen pembantu untuk menampilkan notifikasi toast peringatan sebelum redirect ke /login
+ * Komponen untuk menampilkan notifikasi toast peringatan sebelum redirect ke /login
  */
 function LoginRequired() {
   useEffect(() => {

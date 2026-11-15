@@ -24,41 +24,40 @@ Inas Lathifah - Creator & Lead Developer
 
 ## 🚀 Fitur Utama
 
-- **Mode Data Dummy (Client-Side Mock API):** Dapat berjalan sepenuhnya **tanpa backend terpisah**. Seluruh *request* Axios di-handle oleh server tiruan di sisi klien, dengan data yang tersimpan di `localStorage` dan keamanan password yang di-hash menggunakan `bcrypt`.
-- **Autentikasi Akun Demo:** Fitur *one-click login* dengan akun uji coba untuk memudahkan pengujian aplikasi.
-- **Manajemen State & UI Modern:** Antarmuka responsif dan estetis menggunakan komponen berbasis [shadcn/ui](https://ui.shadcn.com/) dan styling dari Tailwind CSS.
-- **Fleksibilitas Integrasi Backend:** Mendukung transisi mulus dari Mode Dummy ke Backend sungguhan hanya dengan mengubah satu konfigurasi variabel.
+- **Backend nyata + MySQL:** semua data (akun, postingan, komentar, balasan bercabang, like) tersimpan di database MySQL lewat REST API Express (repositori terpisah: `be-sosial-media`).
+- **Upload gambar:** foto profil, gambar postingan, dan gambar komentar diunggah ke server. Gambar divalidasi dari isinya, di-resize, metadata EXIF dibuang, lalu disimpan sebagai WEBP; path-nya disimpan di database.
+- **Akun & keamanan:** registrasi/login dengan JWT, password di-hash `bcrypt`, ganti password/nama/bio/foto profil, hapus akun.
+- **Interaksi sosial:** like, komentar, replies, lihat profil pengguna lain.
+- **UI modern:** antarmuka responsif dengan [shadcn/ui](https://ui.shadcn.com/) dan Tailwind CSS.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend Framework:** [React](https://react.dev/) + [Vite](https://vitejs.dev/)
-- **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/) & PostCSS
-- **Linting & Quality:** ESLint, Stylelint
-- **Deployment Ready:** Vercel (`vercel.json`)
+- **Frontend:** [React](https://react.dev/) + [Vite](https://vitejs.dev/) + TypeScript, Tailwind CSS, shadcn/ui
+- **Backend:** Express 5 (JavaScript) + `mysql2`, JWT, `bcryptjs`, `multer` + `sharp`, `zod`
+- **Database:** MySQL / MariaDB (XAMPP)
 
 ---
 
 ## 📦 Memulai Cepat (Installation & Running)
 
-Ikuti langkah-langkah berikut untuk menjalankan proyek ini di lingkungan lokal Anda:
+Prasyarat: **Node.js 20+** dan MySQL yang sedang menyala (XAMPP).
 
-### 1. Kloning Repositori
+### 1. Jalankan Backend dulu
+Ikuti petunjuk di `README.md` pada folder backend (`be-sosial-media`). 
+Setelah berhasil, API aktif di `http://localhost:8000`.
+
+### 2. Jalankan Frontend
 ```bash
-git clone [https://github.com/inaslathifah/betterdays-social.media.git](https://github.com/inaslathifah/betterdays-social.media.git)
+git clone https://github.com/inaslathifah/betterdays-social.media.git
 ```
 ```bash
 cd betterdays-social.media
 ```
-
-### 2. Instalasi Dependensi
 ```bash
 npm install
 ```
-
-### 3. Jalankan Development Server
 ```bash
-npm run dev
+npm run dev              # buka http://localhost:5173
 ```

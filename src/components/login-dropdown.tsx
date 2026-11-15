@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { userLogout } from "@/utils/apis/auth/api";
 import { useToken } from "@/utils/contexts/token";
-import { Home, Settings, LogOut, User } from "lucide-react";
+import { Settings, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import UserAvatar from "./user-avatar";
@@ -31,7 +31,7 @@ export default function LoginDropdown() {
     try {
       await userLogout(); 
     } catch {
-      // Tetap lanjutkan pembersihan sesi di sisi klien meskipun jaringan error
+      // Tetap lanjutkan pembersihan sesi di sisi klien meskipun jaringan bermasalah
     }
     changeToken();
     navigate("/login", { replace: true });
@@ -40,7 +40,7 @@ export default function LoginDropdown() {
 
   return (
     <DropdownMenu>
-      {/* Tombol Pemicu: Avatar Pengguna di Navbar */}
+      {/* Button Avatar User di Navbar */}
       <DropdownMenuTrigger
         className="rounded-full ring-offset-background transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2"
         aria-label="Menu akun"
@@ -59,22 +59,6 @@ export default function LoginDropdown() {
           </div>
         </div>
         <DropdownMenuSeparator />
-
-        {/* Tautan Beranda (Khusus Tampilan Mobile) */}
-        <Link to="/">
-          <DropdownMenuItem className="gap-2.5 rounded-lg py-2 sm:hidden">
-            <Home className="w-[18px] text-muted-foreground" />
-            Beranda
-          </DropdownMenuItem>
-        </Link>
-
-        {/* Tautan ke Profil Saya */}
-        <Link to="/profile">
-          <DropdownMenuItem className="gap-2.5 rounded-lg py-2">
-            <User className="w-[18px] text-muted-foreground" />
-            Profil saya
-          </DropdownMenuItem>
-        </Link>
 
         {/* Tautan ke Pengaturan / Edit Profil */}
         <Link to="/edit-profile">

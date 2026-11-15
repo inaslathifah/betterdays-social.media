@@ -140,7 +140,7 @@ export function ImagePreview(props: PreviewProps) {
             size === "md" ? "h-28 w-44" : "h-16 w-24"
           )}
         >
-          Gambar tidak dapat dimuat
+          Gambar tidak dapat dimuat ....
         </div>
       ) : (
         <img

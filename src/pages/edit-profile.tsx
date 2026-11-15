@@ -3,7 +3,6 @@
  * Menyediakan dua formulir utama:
  * 1. ProfileForm: Mengubah nama pengguna, bio, dan foto avatar (unggah file baru, link URL, atau hapus foto).
  * 2. PasswordForm: Mengubah password akun dengan validasi password lama & konfirmasi password baru.
- * 3. Opsi Reset Data Demo (khusus mode dummy): Mengembalikan database dummy ke kondisi default.
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -14,7 +13,6 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 import Layout from "@/components/layout";
-import Alert from "@/components/alert";
 import UserAvatar from "@/components/user-avatar";
 import { CustomFormField } from "@/components/custom-formfield";
 import { ImageMenu, UrlInput } from "@/components/image-attach";
@@ -32,16 +30,14 @@ import {
   changePasswordSchema,
   updateProfileSchema,
 } from "@/utils/apis/user/type";
-import { USE_DUMMY_API } from "@/utils/apis/axios-with-config";
 import { useToken } from "@/utils/contexts/token";
 import { isSafeImageUrl } from "@/utils/image";
-import { resetDB } from "@/utils/mock/db";
 
 // Helper membuat objek File kosong sebagai penanda awal
 const emptyFile = () => new File([], "");
 
 /**
- * Form Pengubahan Profil (Nama, Bio, Foto Avatar)
+ * Form Ubah Profil (Nama, Bio, Foto Avatar)
  */
 function ProfileForm() {
   const { user, refreshUser } = useToken();
@@ -119,7 +115,7 @@ function ProfileForm() {
       <CardHeader>
         <CardTitle>Profil</CardTitle>
         <CardDescription>
-          Nama dan foto profilmu akan tampil di navbar, di postingan, dan komentar.
+          {/* Nama dan foto profilmu akan tampil di navbar, di postingan, dan komentar. */}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -329,9 +325,6 @@ function PasswordForm() {
  * Komponen Induk Halaman Pengaturan Akun
  */
 export default function EditProfile() {
-  const { changeToken } = useToken();
-  const [confirmReset, setConfirmReset] = useState(false);
-
   return (
     <Layout withUser navBlue centerX>
       {/* Tautan Kembali ke Halaman Profil */}
@@ -350,36 +343,7 @@ export default function EditProfile() {
         <ProfileForm />
         <PasswordForm />
 
-        {/* Tombol Reset Data Demo (Hanya aktif dalam Mode Dummy) */}
-        {USE_DUMMY_API && (
-          <div className="flex items-center justify-between gap-4 px-1 text-sm text-muted-foreground">
-            <p>Data demo disimpan di browser ini.</p>
-            <button
-              type="button"
-              onClick={() => setConfirmReset(true)}
-              className="shrink-0 underline-offset-4 hover:text-foreground hover:underline"
-            >
-              Reset data demo
-            </button>
-          </div>
-        )}
       </div>
-
-      {/* Dialog Konfirmasi Reset Data Dummy */}
-      <Alert
-        open={confirmReset}
-        onOpenChange={setConfirmReset}
-        title="Reset data demo?"
-        description="Semua akun, postingan, like, dan komentar yang kamu buat akan dihapus, lalu data awal dipulihkan. Kamu akan keluar dari akun."
-        actionText="Reset"
-        destructive
-        onCancel={() => setConfirmReset(false)}
-        onAction={() => {
-          resetDB();
-          changeToken();
-          window.location.assign("/login");
-        }}
-      />
     </Layout>
   );
 }

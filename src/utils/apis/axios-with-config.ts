@@ -1,23 +1,17 @@
 /**
  * Konfigurasi Axios HTTP Client:
- * - Mendukung switch mode antara Backend Sungguhan (REST API server) dan Mock Dummy API (localStorage).
- * - Menangani inject header Authorization: Bearer <token> secara otomatis lewat request interceptor.
+ * - Mengirim request ke backend REST API (lihat folder `server/`).
+ * - Menyisipkan header Authorization: Bearer <token> secara otomatis lewat request interceptor.
+ *
+ * Alamat backend diatur lewat variabel `VITE_API_URL` (lihat `.env.example`).
+ * Default "/api" -> diteruskan ke server backend oleh proxy Vite saat development.
  */
 
 import axios from "axios";
-import { mockAdapter } from "../mock/adapter";
 
-/**
- * Toggle Mode API:
- * - true  : Berjalan dalam mode dummy tanpa backend server (menggunakan adapter localStorage).
- * - false : Mengirim HTTP request sungguhan ke server backend (baseURL).
- */
-export const USE_DUMMY_API = true;
+const API_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "/api";
 
-// Inisialisasi instance axios
-const axiosWithConfig = axios.create(
-  USE_DUMMY_API ? { adapter: mockAdapter } : {}
-);
+const axiosWithConfig = axios.create({ baseURL: API_URL });
 
 // Variabel penyimpan token JWT aktif dalam memori
 let bearerToken = "";
@@ -29,14 +23,11 @@ export const setAxiosConfig = (token: string) => {
   bearerToken = token;
 };
 
-// Request Interceptor: menambahkan baseURL dan header Bearer token di setiap request keluar
+// Request Interceptor: menambahkan header Bearer token di setiap request keluar
 axiosWithConfig.interceptors.request.use((axiosConfig) => {
-  axiosConfig.baseURL = "http://54.169.185.156:8000";
-
   if (bearerToken) {
     axiosConfig.headers.Authorization = `Bearer ${bearerToken}`;
   }
-
   return axiosConfig;
 });
 
