@@ -2,7 +2,7 @@
 
 # 🌟 Betterdays Social Media
 
-**Platform media sosial modern yang dibangun dengan React, TypeScript, dan Vite.**
+**Platform media sosial modern yang dibangun dengan React, TypeScript, Vite, dan Tailwind CSS.**
 
 [![React](https://img.shields.io/badge/React-18.x-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-97%25-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
@@ -18,17 +18,17 @@ Inas Lathifah - Creator & Lead Developer
 
 ## 📖 Tentang Proyek
 
-**Betterdays** adalah aplikasi web media sosial interaktif yang dirancang untuk memberikan pengalaman pengguna yang mulus dalam berbagi momen, berinteraksi, dan mengelola konten. Proyek ini dibangun dengan fokus pada performa tinggi menggunakan tumpukan teknologi modern frontend serta sistem manajemen data yang fleksibel.
+**Betterdays** adalah aplikasi web media sosial interaktif yang dirancang untuk memberikan pengalaman pengguna yang mulus dalam berbagi momen, berinteraksi, dan mengelola konten. Proyek ini dibangun dengan fokus pada performa tinggi menggunakan teknologi modern frontend serta sistem manajemen data yang fleksibel.
 
 ---
 
 ## 🚀 Fitur Utama
 
-- **Backend nyata + MySQL:** semua data (akun, postingan, komentar, balasan bercabang, like) tersimpan di database MySQL lewat REST API Express (repositori terpisah: `be-sosial-media`).
-- **Upload gambar:** foto profil, gambar postingan, dan gambar komentar diunggah ke server. Gambar divalidasi dari isinya, di-resize, metadata EXIF dibuang, lalu disimpan sebagai WEBP; path-nya disimpan di database.
-- **Akun & keamanan:** registrasi/login dengan JWT, password di-hash `bcrypt`, ganti password/nama/bio/foto profil, hapus akun.
-- **Interaksi sosial:** like, komentar, replies, lihat profil pengguna lain.
-- **UI modern:** antarmuka responsif dengan [shadcn/ui](https://ui.shadcn.com/) dan Tailwind CSS.
+- **Backend nyata + MySQL:** semua data (akun, postingan, komentar, balasan bercabang, like) tersimpan di database MySQL lewat REST API Express (repositori terpisah di: `be-sosial-media`).
+- **Upload gambar:** foto profil, gambar postingan, dan gambar komentar diunggah ke server. Lalu disimpan sebagai WEBP; path-nya disimpan di database.
+- **Akun & keamanan:** registrasi/login dengan JWT, password di-hash `bcrypt`, ganti password/nama/bio/foto profil.
+- **Interaksi sosial:** like, komentar, replies, lihat profil user lain.
+- **UI modern:** UI responsif dengan [shadcn/ui](https://ui.shadcn.com/) dan Tailwind CSS.
 
 ---
 
@@ -59,5 +59,5 @@ cd betterdays-social.media
 npm install
 ```
 ```bash
-npm run dev              # buka http://localhost:5173
+npm run dev              
 ```
